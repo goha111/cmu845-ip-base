@@ -324,8 +324,30 @@ void serve(client_info *client) {
     }
 }
 
+
+/*
+ * run - a thread runner function
+ */
+void *run(void *arg) {
+    // get the argument
+    client_info *client = arg;
+
+    // detach itself
+    pthread_detach(pthread_self());
+
+    // call the serve function
+    serve(client);
+
+    // close the client socket connection
+    close(client->connfd);
+
+    // free the memory
+    free(arg);
+    return NULL;
+}
+
+
 int main(int argc, char **argv) {
-    int listenfd;
 
     /* Check command line args */
     if (argc != 2) {
@@ -333,12 +355,19 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    listenfd = Open_listenfd(argv[1]);
+    int listenfd = Open_listenfd(argv[1]);
+
+    // ignore SIGPIPE error
+    Signal(SIGPIPE, SIG_IGN);
 
     while (1) {
-        /* Allocate space on the stack for client info */
-        client_info client_data;
-        client_info *client = &client_data;
+        // Allocate space on the heap for client info
+        client_info *client = malloc(sizeof(*client));
+
+        /* handle malloc() error */
+        if (client == NULL) {
+            continue;
+        }
 
         /* Initialize the length of the address */
         client->addrlen = sizeof(client->addr);
@@ -347,9 +376,17 @@ int main(int argc, char **argv) {
         client->connfd = Accept(listenfd,
                 (SA *) &client->addr, &client->addrlen);
 
+        // handle accept() error
+        if (client->connfd < 0) {
+            free(client);
+            continue;
+        }
+
         /* Connection is established; serve client */
-        serve(client);
-        Close(client->connfd);
+        pthread_t thread;
+        pthread_create(&thread, NULL, run, client);
+//        serve(client);
+//        Close(client->connfd);
     }
 }
 

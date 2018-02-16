@@ -1,6 +1,5 @@
 CC = gcc
-# CFLAGS =-g -O3 -Wall -Werror -Wextra
-CFLAGS =-g -O3 -Wextra
+CFLAGS =-g -O2
 # This flag includes the Pthreads library on a Linux box.
 # Others systems will probably require something different.
 LDLIBS=-lpthread
