@@ -14,6 +14,9 @@ cgi:
 tar:
 	(cd ..; tar cvf tiny.tar tiny)
 
+adder:
+	$(CC) -fPIC -shared adder.c -o adder.so
+
 clean:
 	rm -f *.o tiny *~
 	(cd cgi-bin; make clean)

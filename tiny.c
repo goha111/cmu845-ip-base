@@ -149,7 +149,6 @@ void serve_static(int fd, char *filename, int filesize) {
         fprintf(stderr, "Error writing static response headers to client\n");
     }
 
-
     /* Send response body to client */
     srcfd = Open(filename, O_RDONLY, 0);
     srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
