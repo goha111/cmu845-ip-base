@@ -8,6 +8,7 @@
  */
 #include "csapp.h"
 #include <stdbool.h>
+#include <dlfcn.h>
 
 #define HOSTLEN 256
 #define SERVLEN 8
@@ -183,13 +184,35 @@ void serve_dynamic(int fd, char *filename, char *cgiargs) {
         return;
     }
 
-    if (Fork() == 0) { /* Child */
-        /* Real server would set all CGI vars here */
-        setenv("QUERY_STRING", cgiargs, 1);
-        Dup2(fd, STDOUT_FILENO);         /* Redirect stdout to client */
-        Execve(filename, emptylist, environ); /* Run CGI program */
+    fprintf(stdout, "filename: %s\n", filename);
+    fprintf(stdout, "args: %s\n", cgiargs);
+
+    void *handle = dlopen("./adder.so", RTLD_LAZY);
+    if (!handle) {
+        return;
     }
-    Wait(NULL); /* Parent waits for and reaps child */
+    dlerror();
+    typedef int (*CAC_FUNC)(int, int);
+    CAC_FUNC cac_func = NULL;
+    *(void **) (&cac_func) = dlsym(handle, "add");
+    char *error;
+    if ((error = dlerror()) != NULL)  {
+        fprintf(stderr, "%s\n", error);
+        return;
+    }
+    fprintf(stdout, "add: %d\n", (*cac_func)(2,7));
+//
+//    cac_func = (CAC_FUNC)dlsym(handle, "sub");
+//    printf("sub: %d\n", cac_func(9,2));
+//
+//    cac_func = (CAC_FUNC)dlsym(handle, "mul");
+//    printf("mul: %d\n", cac_func(3,2));
+//
+//    cac_func = (CAC_FUNC)dlsym(handle, "div");
+//    printf("div: %d\n", cac_func(8,2));
+
+    //关闭动态链接库
+    dlclose(handle);
 }
 
 /*

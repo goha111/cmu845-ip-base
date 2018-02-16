@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O2 -Wall -I ..
+CFLAGS = -O2 -fPIC -shared
 
 all: adder
 
@@ -11,3 +11,5 @@ dl: adder.c
 
 clean:
 	rm -f adder *~
+	rm -f *.so
+	rm -f *.o
