@@ -1,25 +1,25 @@
 CC = gcc
 DLFLAGS =-g -O2 -w -rdynamic -I . -ldl
-BASEFLAGS =-O2 -w
+BASEFLAGS =-O2 -w -I .
 LDLIBS=-lpthread
 
-all: base tiny cgi
+all: base dl cgi dll
 
-base: tiny.c csapp.c
+base: base.c csapp.o
+	$(CC) $(BASEFLAGS) -o base base.c csapp.o
+
+dl: dl.c csapp.o
+	$(CC) $(DLFLAGS) -o dl dl.c csapp.o
+
+dll:
+	(cd dll; make)
 
 cgi:
 	(cd cgi-bin; make)
-
-dl: tiny.c csapp.o
-	$(CC) $(DLFLAGS) -o tiny tiny.c csapp.o
-
-adder:
-	$(CC) -fPIC -shared adder.c -o adder.so
 
 csapp.o:
 	$(CC) $(BASEFLAGS) -c csapp.c
 
 clean:
-	rm -f *.o tiny *~
+	rm -f *.o base dl *.so *~
 	(cd cgi-bin; make clean)
-

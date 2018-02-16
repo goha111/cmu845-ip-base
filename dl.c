@@ -211,7 +211,6 @@ void serve_dynamic(int fd, char *filename, char *cgiargs) {
 //    cac_func = (CAC_FUNC)dlsym(handle, "div");
 //    printf("div: %d\n", cac_func(8,2));
 
-    //关闭动态链接库
     dlclose(handle);
 }
 
