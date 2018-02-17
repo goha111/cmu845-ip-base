@@ -1,11 +1,11 @@
 CC = gcc
-FLAGS =-O2 -w -I .
-LDLIBS=-lpthread
+FLAGS =-O3 -Wall -I .
+LDLIBS=-pthread
 
 all: base cgi
 
 base: base.c csapp.o
-	$(CC) $(FLAGS) -o base base.c csapp.o
+	$(CC) $(LDLIBS) $(FLAGS) -o base base.c csapp.o
 
 cgi:
 	(cd cgi-bin; make)
