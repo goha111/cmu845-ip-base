@@ -20,4 +20,4 @@ csapp.o:
 	$(CC) $(CFLAGS) -c csapp.c
 
 clean:
-	rm -f adder mul minus fib *~
+	rm -f adder mul minus fib *.o *~
